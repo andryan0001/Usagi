@@ -46,6 +46,18 @@
 		app:showAsAction="ifRoom|withText" />
 
 	<item
+		android:id="@+id/action_pin"
+		android:icon="@drawable/ic_pin"
+		android:title="@string/pin"
+		app:showAsAction="ifRoom|withText" />
+
+	<item
+		android:id="@+id/action_unpin"
+		android:icon="@drawable/ic_unpin"
+		android:title="@string/unpin"
+		app:showAsAction="ifRoom|withText" />
+
+	<item
 		android:id="@+id/action_select_all"
 		android:icon="?actionModeSelectAllDrawable"
 		android:title="@android:string/selectAll"
