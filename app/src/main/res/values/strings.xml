@@ -703,6 +703,8 @@
     <string name="unpin">Unpin</string>
     <string name="source_pinned">Source pinned</string>
     <string name="source_unpinned">Source unpinned</string>
+    <string name="manga_pinned">Manga pinned</string>
+    <string name="manga_unpinned">Manga unpinned</string>
     <string name="sources_unpinned">Sources unpinned</string>
     <string name="sources_pinned">Sources pinned</string>
     <string name="recent_sources">Recent sources</string>

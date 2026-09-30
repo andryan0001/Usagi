@@ -319,6 +319,36 @@ class FavouritesRepository
 			return ReversibleHandle { recoverToCategory(categoryId, ids) }
 		}
 
+		suspend fun setPinned(
+			ids: Collection<Long>,
+			isPinned: Boolean,
+		): ReversibleHandle {
+			db.getFavouritesDao().setPinned(ids, isPinned)
+			return ReversibleHandle { db.getFavouritesDao().setPinned(ids, !isPinned) }
+		}
+
+		suspend fun setPinned(
+			categoryId: Long,
+			ids: Collection<Long>,
+			isPinned: Boolean,
+		): ReversibleHandle {
+			db.getFavouritesDao().setPinned(categoryId, ids, isPinned)
+			return ReversibleHandle { db.getFavouritesDao().setPinned(categoryId, ids, !isPinned) }
+		}
+
+		suspend fun isAllPinned(ids: Collection<Long>): Boolean {
+			if (ids.isEmpty()) return false
+			return db.getFavouritesDao().countPinned(ids) == ids.size
+		}
+
+		suspend fun isAllPinned(
+			categoryId: Long,
+			ids: Collection<Long>,
+		): Boolean {
+			if (ids.isEmpty()) return false
+			return db.getFavouritesDao().countPinned(categoryId, ids) == ids.size
+		}
+
 		private fun observeOrder(categoryId: Long): Flow<ListSortOrder> =
 			db
 				.getFavouriteCategoriesDao()

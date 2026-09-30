@@ -142,6 +142,26 @@ class FavouritesListViewModel
 			}
 		}
 
+		fun setPinned(
+			ids: Set<Long>,
+			isPinned: Boolean,
+		) {
+			if (ids.isEmpty()) return
+			launchJob(Dispatchers.Default) {
+				val handle =
+					if (categoryId == NO_ID) {
+						repository.setPinned(ids, isPinned)
+					} else {
+						repository.setPinned(categoryId, ids, isPinned)
+					}
+				val resId = if (isPinned) R.string.manga_pinned else R.string.manga_unpinned
+				onActionDone.call(ReversibleAction(resId, handle))
+			}
+		}
+
+		suspend fun isAllPinned(ids: Set<Long>): Boolean =
+			if (categoryId == NO_ID) repository.isAllPinned(ids) else repository.isAllPinned(categoryId, ids)
+
 		fun setSortOrder(order: ListSortOrder) {
 			if (categoryId == NO_ID) {
 				return

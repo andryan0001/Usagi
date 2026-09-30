@@ -14,6 +14,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.draken.usagi.R
 import org.draken.usagi.core.nav.AppRouter
 import org.draken.usagi.core.ui.list.ListSelectionController
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
 import org.draken.usagi.core.util.ext.sortedByOrdinal
 import org.draken.usagi.core.util.ext.withArgs
 import org.draken.usagi.databinding.FragmentListBinding
@@ -90,7 +92,31 @@ class FavouritesListFragment :
 		menu: Menu,
 	): Boolean {
 		menuInflater.inflate(R.menu.mode_favourites, menu)
-		return super.onCreateActionMode(controller, menuInflater, menu)
+		val base = super.onCreateActionMode(controller, menuInflater, menu)
+		// Async visibility for pin/unpin based on current selection
+		viewLifecycleOwner.lifecycleScope.launch {
+			val ids = selectedItemsIds
+			if (ids.isEmpty()) return@launch
+			val allPinned = viewModel.isAllPinned(ids)
+			menu.findItem(R.id.action_pin)?.isVisible = !allPinned
+			menu.findItem(R.id.action_unpin)?.isVisible = allPinned
+		}
+		return base
+	}
+
+	override fun onPrepareActionMode(
+		controller: ListSelectionController,
+		mode: ActionMode?,
+		menu: Menu,
+	): Boolean {
+		viewLifecycleOwner.lifecycleScope.launch {
+			val ids = selectedItemsIds
+			if (ids.isEmpty()) return@launch
+			val allPinned = viewModel.isAllPinned(ids)
+			menu.findItem(R.id.action_pin)?.isVisible = !allPinned
+			menu.findItem(R.id.action_unpin)?.isVisible = allPinned
+		}
+		return super.onPrepareActionMode(controller, mode, menu)
 	}
 
 	override fun onActionItemClicked(
@@ -101,6 +127,18 @@ class FavouritesListFragment :
 		return when (item.itemId) {
 			R.id.action_remove -> {
 				viewModel.removeFromFavourites(selectedItemsIds)
+				mode?.finish()
+				true
+			}
+
+			R.id.action_pin -> {
+				viewModel.setPinned(selectedItemsIds, isPinned = true)
+				mode?.finish()
+				true
+			}
+
+			R.id.action_unpin -> {
+				viewModel.setPinned(selectedItemsIds, isPinned = false)
 				mode?.finish()
 				true
 			}
